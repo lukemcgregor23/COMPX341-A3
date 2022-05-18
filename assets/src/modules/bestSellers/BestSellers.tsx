@@ -47,6 +47,7 @@ export default class BestSellers extends React.Component<BestSellersProps, BestS
         <SearchBar />
         <CategoryNavBar />
         <div>
+          <p>test</p>
           <div className="well-bs no-radius">
             <div className="container-category">
               <h3>Top 20 best sellers</h3>

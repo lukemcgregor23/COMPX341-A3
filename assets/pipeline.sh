@@ -1,9 +1,9 @@
 #bin/bash
-
+set +x
 commit=true
 run=true
 
-while getopts c:m:r: flag
+while getopts crm: flag
 do
     case "${flag}" in
         c) commit=false;;
@@ -12,17 +12,30 @@ do
     esac
 done
 
-npm install
-npm build
-
+echo "Installing Dependancys"
+npm install 1> '/tmp/nodeinstallerr.log' 2> '/dev/null'
+if [ "$?" -ne 0 ];then 
+	cat '/tmp/nodeinstallerr.log'
+	echo "Failed to install dependancys... Exiting"
+	exit
+fi
+echo "Building Application"
+npm run build 1> '/tmp/nodebuilderr.log' 2> '/dev/null'
+if [ "$?" -ne 0 ];then 
+	cat '/tmp/nodebuilderr.log'
+	echo "Failed to Build. This will not be pushed to GIT"
+	exit
+fi
 if "$commit"
 then
-	if [$message == ""]
+	if [ "$message" == "" ]
 	then
 		echo "No commit meessage given"
-	else
-		git add ../*
-		git commit -m $1
+		exit
+	else	
+		echo "Pushing to GIT"
+		git add ../* &> '/dev/null'
+		git commit -m "$message"
 		git push
 	fi
 fi
